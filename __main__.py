@@ -2,6 +2,7 @@ import srcds as rcon
 import time
 import ConfigParser
 import os.path
+import getpass
 
 cmd_ran = False
 rcon_return = None
@@ -45,7 +46,7 @@ cmdList.append(['history', '', 'Display a list of commands that have been ran si
 cmdList.append(['clear', '[number]', 'clear rcon history, if number is selected will clear the amount start from oldest'])
 
 if __name__ == '__main__':
-    print '         pyARAKon'
+    print '         pyARKon'
 
     config = ConfigParser.RawConfigParser()
     if os.path.isfile('settings.cfg'):
@@ -72,7 +73,7 @@ if __name__ == '__main__':
             cfg_input = {}
             cfg_input['host'] = raw_input('ARK RCON IP>>')
             cfg_input['port'] = raw_input('ARK RCON PORT>>')
-            cfg_input['pass'] = raw_input('ARK RCON Password>>')
+            cfg_input['pass'] = getpass.getpass('ARK RCON Password>>')
             cfg_input['timeout'] = 15
             cfg_input['sleep'] = 3
             cfg_input['debug'] = False

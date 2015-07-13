@@ -3,12 +3,12 @@ from distutils.core import setup
 
 setup(
     name='pyARKon',
-    version='1.5.1',
+    version='1.5.2',
     packages=[''],
     url='',
     license='',
     author='Blood Shot & Kitty',
     author_email='',
     description='RCON tool used to manage ARK: Survival Evolved server writen in python',
-    #console=["pyarkon.py"],
+    #console=["__main__.py"],
 )
