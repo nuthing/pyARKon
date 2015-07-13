@@ -1,12 +1,14 @@
 from distutils.core import setup
+#import py2exe
 
 setup(
-    name='pyaRkON',
-    version='1.4.0',
+    name='pyARKon',
+    version='1.5.0',
     packages=[''],
     url='',
     license='',
     author='Blood Shot & Kitty',
     author_email='',
-    description='RCON tool used to manage ARK: Survival Evolved server writen in python'
+    description='RCON tool used to manage ARK: Survival Evolved server writen in python',
+    #console=["pyarkon.py"],
 )

@@ -1,5 +1,7 @@
 import srcds as rcon
 import time
+import ConfigParser
+import os.path
 
 cmd_ran = False
 rcon_return = None
@@ -7,16 +9,6 @@ connectedPlayers = []
 cmdHistory = []
 cmdList = []
 conf = {}
-
-# # # # # # # # # # # # # # #
-#    BASIC CONFIGURATION    #
-# # # # # # # # # # # # # # #
-conf['host'] = "127.0.0.1"
-conf['port'] = 32330
-conf['pass'] = ""
-conf['timeout'] = 15
-conf['sleep'] = 3
-conf['debug'] = False
 
 # # # # # # # # # # # # # # #
 #  ADVANCED CONFIGURATION   #
@@ -44,29 +36,64 @@ cmdList.append(['broadcast', '<message>', 'broadcast your message in the MOTD wi
 cmdList.append(['getchat', '', 'gets chat logs from ark server'])
 cmdList.append(['serverchat', '<message>', 'send a message from rcon to the entire server in chat window'])
 cmdList.append(['serverchatto', '<user> <message>', 'send a message to a specific user through the in-game chat window'])
-
-
-# # # # # # # # # # # # # # #
-#        MASTER CORE        #
-# # # # # # # # # # # # # # #
-# #
-# #    DO NOT EDIT BELOW THIS LINE UNLESS YOU PLAN ON FIXING IT
-# #
+#program commands
 cmdList.append(['man', '<cmd>', 'man <cmd>    info about command'])
 cmdList.append(['help', '', 'prints back this list of commands'])
-#TODO: code history and clear to work properly
+#TODO: store history in a file
 cmdList.append(['history', '', 'Display a list of commands that have been ran since the program has started'])
+#TODO: code history and clear to work properly
 cmdList.append(['clear', '[number]', 'clear rcon history, if number is selected will clear the amount start from oldest'])
 
 if __name__ == '__main__':
-    con = rcon.SourceRcon(conf['host'], conf['port'], conf['pass'], conf['timeout'])
+    print '         pyARAKon'
 
-    print '         pyaRkON'
-    if conf['debug']: print 'Debug: ENABLED'
+    config = ConfigParser.RawConfigParser()
+    if not os.path.isfile('settings.cfg'):
+        print 'You need to configure your settings before using this program.'
+        while 1:
+            cfg_input = {}
+            cfg_input['host'] = raw_input('ARK RCON IP>>')
+            cfg_input['port'] = raw_input('ARK RCON PORT>>')
+            cfg_input['pass'] = raw_input('ARK RCON Password>>')
+            cfg_input['timeout'] = 15
+            cfg_input['sleep'] = 3
+            cfg_input['debug'] = False
+            try:
+                rcon.SourceRcon(cfg_input['host'], int(cfg_input['port']), cfg_input['pass'], int(cfg_input['timeout']))
+                test_pass = True
+            except:
+                print 'Unable to connect to RCON!'
+                test_pass = False
+            if test_pass:
+                config.add_section('pyARKon')
+                config.set('pyARKon', 'host', cfg_input['host'])
+                config.set('pyARKon', 'port', int(cfg_input['port']))
+                config.set('pyARKon', 'pass', cfg_input['pass'])
+                config.set('pyARKon', 'timeout', cfg_input['timeout'])
+                config.set('pyARKon', 'sleep', cfg_input['sleep'])
+                config.set('pyARKon', 'debug', cfg_input['debug'])
+
+                with open('settings.cfg', 'wb') as configfile:
+                    config.write(configfile)
+                break
+    config.read('settings.cfg')
+    conf['host'] = config.get('pyARKon', 'host')
+    conf['port'] = int(config.get('pyARKon', 'port'))
+    conf['pass'] = config.get('pyARKon', 'pass')
+    conf['timeout'] = int(config.get('pyARKon', 'timeout'))
+    conf['sleep'] = int(config.get('pyARKon', 'sleep'))
+    conf['debug'] = bool(config.get('pyARKon', 'debug'))
+
+    try:
+        con = rcon.SourceRcon(conf['host'], conf['port'], conf['pass'], conf['timeout'])
+    except:
+        print 'Unable to connect to RCON!'
+    if conf['debug']:
+        print 'Debug: ENABLED'
     print 'help, for a list of commands'
     print 'man <cmd>, for info about the command'
 
-    while con:
+    while 1:
         cmd_input = raw_input('CMD>>')
         cmdHistory.append('[H]>CMD>'+cmd_input)
         if cmd_input.split(' ', 1)[0] == 'help':
@@ -98,11 +125,11 @@ if __name__ == '__main__':
         else:
             for x in range(len(cmdList)):
                 if cmdList[x][0] == cmd_input.split(' ', 1)[0]:
+                    cmd_ran = True
                     if conf['debug']:
                         print 'cmdlist: '+ cmdList[x][0]
                         print 'cmd_input.split: '+ cmd_input.split(' ', 1)[0]
                         print 'len(cmd_input.split): '+ str(len(cmd_input.split(' ')))
-                    cmd_ran = True
 
                     if cmdList[x][0] == 'quit':
                         print 'Are you sure you want to KILL your server?'
