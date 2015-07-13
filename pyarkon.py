@@ -48,7 +48,25 @@ if __name__ == '__main__':
     print '         pyARAKon'
 
     config = ConfigParser.RawConfigParser()
-    if not os.path.isfile('settings.cfg'):
+    if os.path.isfile('settings.cfg'):
+        config.read('settings.cfg')
+        conf['host'] = config.get('pyARKon', 'host')
+        conf['port'] = int(config.get('pyARKon', 'port'))
+        conf['pass'] = config.get('pyARKon', 'pass')
+        conf['timeout'] = int(config.get('pyARKon', 'timeout'))
+        conf['sleep'] = int(config.get('pyARKon', 'sleep'))
+        conf['debug'] = bool(config.get('pyARKon', 'debug'))
+        try:
+            con = rcon.SourceRcon(conf['host'], conf['port'], conf['pass'], conf['timeout'])
+            con.rcon('listplayers')
+            test_pass = True
+        except:
+            print 'Unable to connect to RCON!'
+            test_pass = False
+    else:
+        test_pass = False
+
+    if not test_pass:
         print 'You need to configure your settings before using this program.'
         while 1:
             cfg_input = {}
@@ -59,7 +77,8 @@ if __name__ == '__main__':
             cfg_input['sleep'] = 3
             cfg_input['debug'] = False
             try:
-                rcon.SourceRcon(cfg_input['host'], int(cfg_input['port']), cfg_input['pass'], int(cfg_input['timeout']))
+                con = rcon.SourceRcon(cfg_input['host'], int(cfg_input['port']), cfg_input['pass'], int(cfg_input['timeout']))
+                con.rcon('listplayers')
                 test_pass = True
             except:
                 print 'Unable to connect to RCON!'
@@ -72,20 +91,19 @@ if __name__ == '__main__':
                 config.set('pyARKon', 'timeout', cfg_input['timeout'])
                 config.set('pyARKon', 'sleep', cfg_input['sleep'])
                 config.set('pyARKon', 'debug', cfg_input['debug'])
+                conf['host'] = cfg_input['host']
+                conf['port'] = int(cfg_input['port'])
+                conf['pass'] = cfg_input['timeout']
+                conf['timeout'] = cfg_input['timeout']
+                conf['sleep'] = cfg_input['sleep']
+                conf['debug'] = cfg_input['debug']
 
                 with open('settings.cfg', 'wb') as configfile:
                     config.write(configfile)
                 break
-    config.read('settings.cfg')
-    conf['host'] = config.get('pyARKon', 'host')
-    conf['port'] = int(config.get('pyARKon', 'port'))
-    conf['pass'] = config.get('pyARKon', 'pass')
-    conf['timeout'] = int(config.get('pyARKon', 'timeout'))
-    conf['sleep'] = int(config.get('pyARKon', 'sleep'))
-    conf['debug'] = bool(config.get('pyARKon', 'debug'))
-
     try:
         con = rcon.SourceRcon(conf['host'], conf['port'], conf['pass'], conf['timeout'])
+        con.rcon('listplayers')
     except:
         print 'Unable to connect to RCON!'
     if conf['debug']:
