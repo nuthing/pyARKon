@@ -2,6 +2,7 @@ import srcds as rcon
 import time
 import ConfigParser
 import os.path
+import getpass
 
 cmd_ran = False
 rcon_return = None
@@ -55,7 +56,7 @@ if __name__ == '__main__':
         conf['pass'] = config.get('pyARKon', 'pass')
         conf['timeout'] = int(config.get('pyARKon', 'timeout'))
         conf['sleep'] = int(config.get('pyARKon', 'sleep'))
-        conf['debug'] = bool(config.get('pyARKon', 'debug'))
+        conf['debug'] = config.getboolean('pyARKon', 'debug')
         try:
             con = rcon.SourceRcon(conf['host'], conf['port'], conf['pass'], conf['timeout'])
             con.rcon('listplayers')
@@ -72,7 +73,7 @@ if __name__ == '__main__':
             cfg_input = {}
             cfg_input['host'] = raw_input('ARK RCON IP>>')
             cfg_input['port'] = raw_input('ARK RCON PORT>>')
-            cfg_input['pass'] = raw_input('ARK RCON Password>>')
+            cfg_input['pass'] = getpass.getpass('ARK RCON Password>>')
             cfg_input['timeout'] = 15
             cfg_input['sleep'] = 3
             cfg_input['debug'] = False
@@ -98,7 +99,7 @@ if __name__ == '__main__':
                 conf['sleep'] = cfg_input['sleep']
                 conf['debug'] = cfg_input['debug']
 
-                with open('settings.cfg', 'wb') as configfile:
+                with open('settings.cfg', 'w') as configfile:
                     config.write(configfile)
                 break
     try:
@@ -119,7 +120,7 @@ if __name__ == '__main__':
                 print cmdList[x][0]
                 cmd_ran = True
 
-        if cmd_input.split(' ', 1)[0] == 'history':
+        elif cmd_input.split(' ', 1)[0] == 'history':
             for x in range(len(cmdHistory)):
                 print cmdHistory[x]
                 cmd_ran = True
