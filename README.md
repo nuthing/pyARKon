@@ -17,3 +17,6 @@ Edit setup.py and remove the # from the following two lines:
 
 Then cd to the directory you downloaded the source and run:
 python setup.py py2exe
+
+
+[Edit]: I'm not very good at making readme files, as you can see. Feel free to update.
