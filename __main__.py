@@ -7,6 +7,7 @@ import getpass
 cmd_ran = False
 rcon_return = None
 connectedPlayers = []
+chatHistory = []
 cmdHistory = []
 cmdList = []
 conf = {}
@@ -14,8 +15,8 @@ conf = {}
 # # # # # # # # # # # # # # #
 #  ADVANCED CONFIGURATION   #
 # # # # # # # # # # # # # # #
-#[syntax]: cmdList.append([<RconCommand>, <SanityVariable>, <Description>])
-#player commands
+# [syntax]: cmdList.append([<RconCommand>, <SanityVariable>, <Description>])
+# player commands
 cmdList.append(['listplayers', '', 'list current players in the server'])
 cmdList.append(['kickplayer', '<Steam64ID>', 'kick player from server, cmd>>listplayers'])
 cmdList.append(['allowplayertojoinnocheck', '<playername>', 'whitelist player to re-join even if server locked, cmd>>listplayers'])
@@ -23,27 +24,26 @@ cmdList.append(['disallowplayertojoinnocheck', '<playername>', 'removes user fro
 cmdList.append(['banplayer', '<Steam64ID>', 'ban player by steam id from server, cmd>>listplayers'])
 cmdList.append(['unbanplayer', '<Steam64ID>', 'unban player from server'])
 cmdList.append(['playersonly', '', 'stop/pause craft&creature movement'])
-#server commands
+# server commands
 cmdList.append(['slomo', '<0.0>', 'speeds up server time, uses float max of 5.0?'])
 cmdList.append(['pause', '', 'Pause server.'])
 cmdList.append(['destroyallenemies', '', 'WARNING(death): destroy all enemy/dino'])
 cmdList.append(['saveworld', '', 'CAUTION(lag): force world save'])
 cmdList.append(['quit', '', 'WARNING(corruption): kill server!! in rcon cmd>>pause cmd>>saveworld cmd>>quit'])
 cmdList.append(['settimeofday', '<06:00:00>', 'set time of day, 24hr seperated by hrs:min:sec'])
-#chat commands
+# chat commands
 cmdList.append(['setmessageoftheday', '<message>', 'sets the MOTD for everyone in the server'])
 cmdList.append(['showmessageoftheday', '<seconds>', 'displays the current MOTD for everyone in the server'])
 cmdList.append(['broadcast', '<message>', 'broadcast your message in the MOTD window to all the players currently online'])
 cmdList.append(['getchat', '', 'gets chat logs from ark server'])
 cmdList.append(['serverchat', '<message>', 'send a message from rcon to the entire server in chat window'])
 cmdList.append(['serverchatto', '<user> <message>', 'send a message to a specific user through the in-game chat window'])
-#program commands
+# program commands
 cmdList.append(['man', '<cmd>', 'man <cmd>    info about command'])
 cmdList.append(['help', '', 'prints back this list of commands'])
-#TODO: store history in a file
-cmdList.append(['history', '', 'Display a list of commands that have been ran since the program has started'])
-#TODO: code history and clear to work properly
-cmdList.append(['clear', '[number]', 'clear rcon history, if number is selected will clear the amount start from oldest'])
+# TODO: store history in a file
+cmdList.append(['history', '[cmd|chat]', 'show history of cmd or chat (use getchat to save chat history), in non selected will show cmd history'])
+cmdList.append(['clear', '[cmd|chat]', 'clear cmd or chat history, in non selected will clear cmd history'])
 
 if __name__ == '__main__':
     print '         pyARKon'
@@ -104,9 +104,9 @@ if __name__ == '__main__':
                 break
     try:
         con = rcon.SourceRcon(conf['host'], conf['port'], conf['pass'], conf['timeout'])
-        con.rcon('listplayers')
     except:
         print 'Unable to connect to RCON!'
+
     if conf['debug']:
         print 'Debug: ENABLED'
     print 'help, for a list of commands'
@@ -120,9 +120,15 @@ if __name__ == '__main__':
                 print cmdList[x][0]
                 cmd_ran = True
 
-        elif cmd_input.split(' ', 1)[0] == 'history':
+        elif len(cmd_input.split(' ', 1)) == 1 and cmd_input.split(' ', 1)[0] == 'history':
             for x in range(len(cmdHistory)):
                 print cmdHistory[x]
+                cmd_ran = True
+
+        elif len(cmd_input.split(' ', 1)) == 1 and cmd_input.split(' ', 1)[0] == 'clear':
+            for x in range(len(cmdHistory)):
+                cmdHistory.remove(x)
+                print 'History of cmd has been cleared.'
                 cmd_ran = True
 
         elif cmd_input.split(' ', 1)[0] == 'man':
@@ -150,7 +156,29 @@ if __name__ == '__main__':
                         print 'cmd_input.split: '+ cmd_input.split(' ', 1)[0]
                         print 'len(cmd_input.split): '+ str(len(cmd_input.split(' ')))
 
-                    if cmdList[x][0] == 'quit':
+                    if len(cmd_input.split(' ', 1)) > 1 and cmdList[x][0] == 'history':
+                        if cmd_input.split(' ', 1)[1] == 'cmd':
+                            for y in range(len(cmdHistory)):
+                                print cmdHistory[y]
+                        elif cmd_input.split(' ', 1)[1] == 'chat':
+                            for y in range(len(chatHistory)):
+                                print chatHistory[y]
+                        else:
+                            print '-bash: Unknown cmd argument. Type man history for help.'
+
+                    elif len(cmd_input.split(' ', 1)) > 1 and cmd_input.split(' ', 1)[0] == 'clear':
+                        if cmd_input.split(' ', 1)[1] == 'cmd':
+                            for y in range(len(cmdHistory)):
+                                cmdHistory.remove(y)
+                                print 'History for cmd has been cleared.'
+                        elif cmd_input.split(' ', 1)[1] == 'chat':
+                            for y in range(len(chatHistory)):
+                                chatHistory.remove(y)
+                                print 'History for chat has been cleared.'
+                        else:
+                            print '-bash: Unknown cmd argument. Type man clear for help.'
+
+                    elif cmdList[x][0] == 'quit':
                         print 'Are you sure you want to KILL your server?'
                         print 'Note: Unless you CMD>>saveworld, you may loose progress in your world!'
                         quit_input = raw_input('KillServer [y/N]')
@@ -162,6 +190,15 @@ if __name__ == '__main__':
 
                     elif len(cmd_input.split(' ', 1)) == 1 and cmdList[x][0] == 'broadcast':
                         print '-bash: Missing cmd argument. Type man broadcast for help.'
+
+                    elif len(cmd_input.split(' ')) == 1 and cmdList[x][0] == 'getchat':
+                        rcon_return = con.rcon(cmdList[x][0])
+                        for chatline in rcon_return.splitlines():
+                           chatHistory.append(chatline)
+                        rcon_ran = True
+                        if range(len(rcon_return.splitlines())) == 0:
+                            print 'There are currently no messages to retrieve on the server.'
+                            break
 
                     elif len(cmd_input.split(' ')) == 1 and cmdList[x][0] == 'listplayers':
                         rcon_return = con.rcon(cmdList[x][0])
@@ -226,7 +263,6 @@ if __name__ == '__main__':
                             print 'That player is currently not in the server.'
                             break
 
-
                     elif len(cmd_input.split(' ')) > 1:
                         rcon_return = con.rcon(cmdList[x][0] + ' ' + cmd_input.split(' ', 1)[1])
 
@@ -236,7 +272,7 @@ if __name__ == '__main__':
         if cmd_ran:
             if rcon_return is not None:
                 if rcon_return == 'Server received, But no response!!':
-                    print 'CMD sent to server successfully.'
+                    pass
                 else:
                     print rcon_return
                 time.sleep(conf['sleep'])
