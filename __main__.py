@@ -57,18 +57,22 @@ if __name__ == '__main__':
         conf['timeout'] = int(config.get('pyARKon', 'timeout'))
         conf['sleep'] = int(config.get('pyARKon', 'sleep'))
         conf['debug'] = config.getboolean('pyARKon', 'debug')
+
         try:
             con = rcon.SourceRcon(conf['host'], conf['port'], conf['pass'], conf['timeout'])
             con.rcon('listplayers')
             test_pass = True
+
         except:
             print 'Unable to connect to RCON!'
             test_pass = False
+
     else:
         test_pass = False
 
     if not test_pass:
         print 'You need to configure your settings before using this program.'
+
         while 1:
             cfg_input = {}
             cfg_input['host'] = raw_input('ARK RCON IP>>')
@@ -77,13 +81,16 @@ if __name__ == '__main__':
             cfg_input['timeout'] = 15
             cfg_input['sleep'] = 3
             cfg_input['debug'] = False
+
             try:
                 con = rcon.SourceRcon(cfg_input['host'], int(cfg_input['port']), cfg_input['pass'], int(cfg_input['timeout']))
                 con.rcon('listplayers')
                 test_pass = True
+
             except:
                 print 'Unable to connect to RCON!'
                 test_pass = False
+
             if test_pass:
                 config.add_section('pyARKon')
                 config.set('pyARKon', 'host', cfg_input['host'])
@@ -102,6 +109,7 @@ if __name__ == '__main__':
                 with open('settings.cfg', 'w') as configfile:
                     config.write(configfile)
                 break
+
     try:
         con = rcon.SourceRcon(conf['host'], conf['port'], conf['pass'], conf['timeout'])
     except:
@@ -109,12 +117,14 @@ if __name__ == '__main__':
 
     if conf['debug']:
         print 'Debug: ENABLED'
+
     print 'help, for a list of commands'
     print 'man <cmd>, for info about the command'
 
     while 1:
         cmd_input = raw_input('CMD>>')
         cmdHistory.append('[H]>CMD>'+cmd_input)
+
         if cmd_input.split(' ', 1)[0] == 'help':
             for x in range(len(cmdList)):
                 print cmdList[x][0]
@@ -151,6 +161,7 @@ if __name__ == '__main__':
             for x in range(len(cmdList)):
                 if cmdList[x][0] == cmd_input.split(' ', 1)[0]:
                     cmd_ran = True
+
                     if conf['debug']:
                         print 'cmdlist: '+ cmdList[x][0]
                         print 'cmd_input.split: '+ cmd_input.split(' ', 1)[0]
@@ -160,9 +171,11 @@ if __name__ == '__main__':
                         if cmd_input.split(' ', 1)[1] == 'cmd':
                             for y in range(len(cmdHistory)):
                                 print cmdHistory[y]
+
                         elif cmd_input.split(' ', 1)[1] == 'chat':
                             for y in range(len(chatHistory)):
                                 print chatHistory[y]
+
                         else:
                             print '-bash: Unknown cmd argument. Type man history for help.'
 
@@ -171,10 +184,12 @@ if __name__ == '__main__':
                             for y in range(len(cmdHistory)):
                                 cmdHistory.remove(y)
                                 print 'History for cmd has been cleared.'
+
                         elif cmd_input.split(' ', 1)[1] == 'chat':
                             for y in range(len(chatHistory)):
                                 chatHistory.remove(y)
                                 print 'History for chat has been cleared.'
+
                         else:
                             print '-bash: Unknown cmd argument. Type man clear for help.'
 
@@ -183,6 +198,7 @@ if __name__ == '__main__':
                         print 'Note: Unless you CMD>>saveworld, you may loose progress in your world!'
                         quit_input = raw_input('KillServer [y/N]')
                         cmdHistory.append('[H]>KillServer [y/N]>' + quit_input)
+
                         if quit_input.split(' ', 1)[0] == ('y' or 'Y'):
                              rcon_return = con.rcon(cmdList[x][0])
                         else:
@@ -193,9 +209,11 @@ if __name__ == '__main__':
 
                     elif len(cmd_input.split(' ')) == 1 and cmdList[x][0] == 'getchat':
                         rcon_return = con.rcon(cmdList[x][0])
+
                         for chatline in rcon_return.splitlines():
                            chatHistory.append(chatline)
                         rcon_ran = True
+
                         if range(len(rcon_return.splitlines())) == 0:
                             print 'There are currently no messages to retrieve on the server.'
                             break
