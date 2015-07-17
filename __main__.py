@@ -200,7 +200,7 @@ if __name__ == '__main__':
                         cmdHistory.append('[H]>KillServer [y/N]>' + quit_input)
 
                         if quit_input.split(' ', 1)[0] == ('y' or 'Y'):
-                             rcon_return = con.rcon(cmdList[x][0])
+                            rcon_return = con.rcon(cmdList[x][0])
                         else:
                             break
 
@@ -211,7 +211,8 @@ if __name__ == '__main__':
                         rcon_return = con.rcon(cmdList[x][0])
 
                         for chatline in rcon_return.splitlines():
-                           chatHistory.append(chatline)
+                            if len(chatline) > 0:
+                                chatHistory.append(chatline)
                         rcon_ran = True
 
                         if range(len(rcon_return.splitlines())) == 0:
