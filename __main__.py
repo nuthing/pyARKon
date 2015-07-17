@@ -211,13 +211,15 @@ if __name__ == '__main__':
                         rcon_return = con.rcon(cmdList[x][0])
 
                         for chatline in rcon_return.splitlines():
-                            if len(chatline) > 0:
+                            if len(chatline) > 1 and not chatline.__contains__('Server received, But no response!!'):
                                 chatHistory.append(chatline)
-                        rcon_ran = True
+                                print chatline
 
                         if range(len(rcon_return.splitlines())) == 0:
                             print 'There are currently no messages to retrieve on the server.'
                             break
+
+                        rcon_return = None
 
                     elif len(cmd_input.split(' ')) == 1 and cmdList[x][0] == 'listplayers':
                         rcon_return = con.rcon(cmdList[x][0])
