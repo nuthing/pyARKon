@@ -42,8 +42,8 @@ cmdList.append(['serverchatto', '<user> <message>', 'send a message to a specifi
 cmdList.append(['man', '<cmd>', 'man <cmd>    info about command'])
 cmdList.append(['help', '', 'prints back this list of commands'])
 # TODO: store history in a file
-cmdList.append(['history', '[cmd|chat]', 'show history of cmd or chat (use getchat to save chat history), in non selected will show cmd history'])
-cmdList.append(['clear', '[cmd|chat]', 'clear cmd or chat history, in non selected will clear cmd history'])
+cmdList.append(['history', '[(cmd)|chat]', 'show history of cmd or chat (use getchat to save chat history), in non selected will show cmd history'])
+cmdList.append(['clear', '[(cmd)|chat]', 'clear cmd or chat history, in non selected will clear cmd history'])
 
 if __name__ == '__main__':
     print '         pyARKon'
