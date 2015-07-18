@@ -1,5 +1,5 @@
 from distutils.core import setup
-import py2exe
+#import py2exe
 
 setup(
     name='pyARKon',
@@ -10,5 +10,5 @@ setup(
     author='Blood Shot & Kitty',
     author_email='',
     description='RCON tool used to manage ARK: Survival Evolved server writen in python',
-    console=["__main__.py"],
+    #console=["__main__.py"],
 )
