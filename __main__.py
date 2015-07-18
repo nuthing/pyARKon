@@ -78,6 +78,7 @@ if __name__ == '__main__':
             cfg_input['host'] = raw_input('ARK RCON IP>>')
             cfg_input['port'] = raw_input('ARK RCON PORT>>')
             cfg_input['pass'] = getpass.getpass('ARK RCON Password>>')
+            #cfg_input['pass'] = raw_input('Raw Password>>')
             cfg_input['timeout'] = 15
             cfg_input['sleep'] = 3
             cfg_input['debug'] = False
@@ -106,14 +107,13 @@ if __name__ == '__main__':
                 conf['sleep'] = cfg_input['sleep']
                 conf['debug'] = cfg_input['debug']
 
-                with open('settings.cfg', 'w') as configfile:
-                    config.write(configfile)
+                if os.path.isfile('settings.cfg'):
+                    with open('settings.cfg', 'w') as configfile:
+                        config.write(configfile)
+                else:
+                    with open('settings.cfg', 'wb') as configfile:
+                        config.write(configfile)
                 break
-
-    try:
-        con = rcon.SourceRcon(conf['host'], conf['port'], conf['pass'], conf['timeout'])
-    except:
-        print 'Unable to connect to RCON!'
 
     if conf['debug']:
         print 'Debug: ENABLED'
