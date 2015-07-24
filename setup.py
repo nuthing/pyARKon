@@ -3,7 +3,7 @@ from distutils.core import setup
 
 setup(
     name='pyARKon',
-    version='1.5.6',
+    version='1.6',
     packages=[''],
     url='',
     license='',
