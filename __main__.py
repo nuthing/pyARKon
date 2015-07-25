@@ -123,10 +123,16 @@ if __name__ == '__main__':
     print 'man <cmd>, for info about the command'
 
     while 1:
-        if len(sys.argv()) > 0:
-            cmd_input = sys.argv
+        if conf['debug']:
+            print sys.argv
+            print len(sys.argv)
+
+        if len(sys.argv) > 1:
+            cmd_input = str(' '.join(sys.argv[1:]))
+
         else:
             cmd_input = raw_input('CMD>>')
+
         cmdHistory.append('[H]>CMD>'+cmd_input)
 
         if cmd_input.split(' ', 1)[0] == 'help':
@@ -306,7 +312,7 @@ if __name__ == '__main__':
         else:
             print '-bash: That command is not support. Type help after CMD>> for a list of commands.'
 
-        if len(sys.argv()) > 0:
+        if len(sys.argv) > 1:
             break
         else:
             pass
