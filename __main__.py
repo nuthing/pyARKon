@@ -3,6 +3,7 @@ import time
 import ConfigParser
 import os.path
 import getpass
+import sys
 
 cmd_ran = False
 rcon_return = None
@@ -122,7 +123,16 @@ if __name__ == '__main__':
     print 'man <cmd>, for info about the command'
 
     while 1:
-        cmd_input = raw_input('CMD>>')
+        if conf['debug']:
+            print sys.argv
+            print len(sys.argv)
+
+        if len(sys.argv) > 1:
+            cmd_input = str(' '.join(sys.argv[1:]))
+
+        else:
+            cmd_input = raw_input('CMD>>')
+
         cmdHistory.append('[H]>CMD>'+cmd_input)
 
         if cmd_input.split(' ', 1)[0] == 'help':
@@ -301,5 +311,10 @@ if __name__ == '__main__':
             cmd_ran = False
         else:
             print '-bash: That command is not support. Type help after CMD>> for a list of commands.'
+
+        if len(sys.argv) > 1:
+            break
+        else:
+            pass
 
     print 'Disconnected from ARK Server RCON'
