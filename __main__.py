@@ -1,7 +1,8 @@
 import srcds as rcon
 import time
 import ConfigParser
-import os.path
+import os
+import errno
 import getpass
 import sys
 
@@ -19,32 +20,33 @@ conf = {}
 # [syntax]: cmdList.append([<RconCommand>, <SanityVariable>, <Description>])
 # player commands
 cmdList.append(['listplayers', '', 'list current players in the server'])
-cmdList.append(['kickplayer', '<Steam64ID>', 'kick player from server, cmd>>listplayers'])
-cmdList.append(['allowplayertojoinnocheck', '<playername>', 'whitelist player to re-join even if server locked, cmd>>listplayers'])
-cmdList.append(['disallowplayertojoinnocheck', '<playername>', 'removes user from whitelist, cmd>>listplayers'])
-cmdList.append(['banplayer', '<Steam64ID>', 'ban player by steam id from server, cmd>>listplayers'])
-cmdList.append(['unbanplayer', '<Steam64ID>', 'unban player from server'])
-cmdList.append(['playersonly', '', 'stop/pause craft&creature movement'])
+cmdList.append(['kickplayer', '<Steam64ID>', 'kick player by steamID, cmd>>listplayers'])
+cmdList.append(['allowplayertojoinnocheck', '<PlayerName>', 'add user to the whitelist, cmd>>listplayers'])
+cmdList.append(['disallowplayertojoinnocheck', '<PlayerName>', 'remove user from whitelist, cmd>>listplayers'])
+cmdList.append(['banplayer', '<Steam64ID>', 'ban player by steamID, cmd>>listplayers'])
+cmdList.append(['unbanplayer', '<Steam64ID>', 'unban player by steamID'])
+cmdList.append(['playersonly', '', 'Freeze crafting and creature movement'])
 # server commands
-cmdList.append(['slomo', '<0.0>', 'speeds up server time, uses float max of 5.0?'])
-cmdList.append(['pause', '', 'Pause server.'])
+cmdList.append(['slomo', '<0.0 - 5.0>', 'Speed up or slow down server time float multiplier'])
+cmdList.append(['pause', '', 'Pauses the server.'])
 cmdList.append(['destroyallenemies', '', 'WARNING(death): destroy all enemy/dino'])
 cmdList.append(['saveworld', '', 'CAUTION(lag): force world save'])
 cmdList.append(['quit', '', 'WARNING(corruption): kill server!! in rcon cmd>>pause cmd>>saveworld cmd>>quit'])
-cmdList.append(['settimeofday', '<06:00:00>', 'set time of day, 24hr seperated by hrs:min:sec'])
+cmdList.append(['settimeofday', '<00:00 - 23:59>', 'set time of day, 24hr separated by hrs:min'])
 # chat commands
-cmdList.append(['setmessageoftheday', '<message>', 'sets the MOTD for everyone in the server'])
-cmdList.append(['showmessageoftheday', '<seconds>', 'displays the current MOTD for everyone in the server'])
-cmdList.append(['broadcast', '<message>', 'broadcast your message in the MOTD window to all the players currently online'])
-cmdList.append(['getchat', '', 'gets chat logs from ark server'])
-cmdList.append(['serverchat', '<message>', 'send a message from rcon to the entire server in chat window'])
-cmdList.append(['serverchatto', '<user> <message>', 'send a message to a specific user through the in-game chat window'])
+cmdList.append(['setmessageoftheday', '<message>', 'sets the MOTD'])
+cmdList.append(['showmessageoftheday', '<seconds>', 'displays the current MOTD'])
+cmdList.append(['broadcast', '<message>', 'broadcast a message in the MOTD window to all players'])
+cmdList.append(['getchat', '', 'get chat log from server, if chat loggin is set to True, logs to Chat.log'])
+cmdList.append(['serverchat', '<message>', 'send a message from rcon to the server in chat window'])
+cmdList.append(['serverchatto', '<Steam64ID> <message>', 'msg user by steamID(steamID in quotes)'])
+cmdList.append(['serverchattoplayer', '<PlayerName> <message>', 'msg user by playername(playername in quotes)'])
 # program commands
 cmdList.append(['man', '<cmd>', 'man <cmd>    info about command'])
 cmdList.append(['help', '', 'prints back this list of commands'])
 # TODO: store history in a file
-cmdList.append(['history', '[(cmd)|chat]', 'show history of cmd or chat (use getchat to save chat history), in non selected will show cmd history'])
-cmdList.append(['clear', '[(cmd)|chat]', 'clear cmd or chat history, in non selected will clear cmd history'])
+cmdList.append(['history', '[(cmd)|chat]', 'show chat/cmd history, use getchat to save chat history'])
+cmdList.append(['clear', '[(cmd)|chat]', 'clear chat/cmd history, no argument will clear cmd history'])
 
 if __name__ == '__main__':
     print '         pyARKon'
@@ -58,6 +60,19 @@ if __name__ == '__main__':
         conf['timeout'] = int(config.get('pyARKon', 'timeout'))
         conf['sleep'] = int(config.get('pyARKon', 'sleep'))
         conf['debug'] = config.getboolean('pyARKon', 'debug')
+        if config.has_option('pyARKon', 'logs'):
+            conf['logs'] = config.getboolean('pyARKon', 'logs')
+        else:
+            cfg_input_logs = raw_input('Log chat to file: True/False>>')
+            conf['logs'] = cfg_input_logs
+            config.set('pyARKon', 'logs', cfg_input_logs)
+
+            if os.path.isfile('settings.cfg'):
+                with open('settings.cfg', 'w') as configfile:
+                    config.write(configfile)
+            else:
+                with open('settings.cfg', 'wb') as configfile:
+                    config.write(configfile)
 
         try:
             con = rcon.SourceRcon(conf['host'], conf['port'], conf['pass'], conf['timeout'])
@@ -83,7 +98,7 @@ if __name__ == '__main__':
             cfg_input['timeout'] = 15
             cfg_input['sleep'] = 3
             cfg_input['debug'] = False
-
+            cfg_input['logs'] = raw_input('Log chat to file: True/False>>')
             try:
                 con = rcon.SourceRcon(cfg_input['host'], int(cfg_input['port']), cfg_input['pass'], int(cfg_input['timeout']))
                 con.rcon('listplayers')
@@ -101,12 +116,14 @@ if __name__ == '__main__':
                 config.set('pyARKon', 'timeout', cfg_input['timeout'])
                 config.set('pyARKon', 'sleep', cfg_input['sleep'])
                 config.set('pyARKon', 'debug', cfg_input['debug'])
+                config.set('pyARKon', 'tlogs', cfg_input['logs'])
                 conf['host'] = cfg_input['host']
                 conf['port'] = int(cfg_input['port'])
                 conf['pass'] = cfg_input['timeout']
                 conf['timeout'] = cfg_input['timeout']
                 conf['sleep'] = cfg_input['sleep']
                 conf['debug'] = cfg_input['debug']
+                conf['logs'] = cfg_input['logs']
 
                 if os.path.isfile('settings.cfg'):
                     with open('settings.cfg', 'w') as configfile:
@@ -134,10 +151,19 @@ if __name__ == '__main__':
             cmd_input = raw_input('CMD>>')
 
         cmdHistory.append('[H]>CMD>'+cmd_input)
+        if conf['logs']:
+            try:
+                os.makedirs("logs")
+            except OSError as exception:
+                if exception.errno != errno.EEXIST:
+                    print 'Unable to create logs folder.'
+            cmdHist = open("logs\CMD.log", "a")
+            cmdHist.write(time.strftime("[%m/%d/%Y %H:%M:%S %p] ") + cmd_input + '\n')
+            cmdHist.close()
 
         if cmd_input.split(' ', 1)[0] == 'help':
             for x in range(len(cmdList)):
-                print cmdList[x][0]
+                print cmdList[x][0] + ' ' + cmdList[x][1]
                 cmd_ran = True
 
         elif len(cmd_input.split(' ', 1)) == 1 and cmd_input.split(' ', 1)[0] == 'history':
@@ -179,12 +205,37 @@ if __name__ == '__main__':
 
                     if len(cmd_input.split(' ', 1)) > 1 and cmdList[x][0] == 'history':
                         if cmd_input.split(' ', 1)[1] == 'cmd':
-                            for y in range(len(cmdHistory)):
-                                print cmdHistory[y]
+                            if conf['logs']:
+                                for cmdHist in open("logs\CMD.log").read().splitlines():
+                                    print cmdHist
+                            else:
+                                for y in range(len(cmdHistory)):
+                                    print cmdHistory
 
                         elif cmd_input.split(' ', 1)[1] == 'chat':
-                            for y in range(len(chatHistory)):
-                                print chatHistory[y]
+                            rcon_return = con.rcon('getchat')
+                            if conf['logs']:
+                                try:
+                                    os.makedirs("logs")
+                                except OSError as exception:
+                                    if exception.errno != errno.EEXIST:
+                                        print 'Unable to create logs folder.'
+                                clHist = open("logs\Chat.log", "a")
+                            for chatline in rcon_return.splitlines():
+                                if len(chatline) > 1 and not chatline.__contains__('Server received, But no response!!'):
+                                    chatHistory.append(chatline)
+                                    if conf['logs']:
+                                        clHist.write(chatline + '\n')
+                            if conf['logs']:
+                                clHist.close()
+
+                            rcon_return = None
+                            if conf['logs']:
+                                for chatHist in open("logs\Chat.log").read().splitlines():
+                                    print chatHist
+                            else:
+                                for y in range(len(chatHistory)):
+                                    print chatHistory[y]
 
                         else:
                             print '-bash: Unknown cmd argument. Type man history for help.'
@@ -204,8 +255,8 @@ if __name__ == '__main__':
                             print '-bash: Unknown cmd argument. Type man clear for help.'
 
                     elif cmdList[x][0] == 'quit':
-                        print 'Are you sure you want to KILL your server?'
-                        print 'Note: Unless you CMD>>saveworld, you may loose progress in your world!'
+                        print 'Are you sure you want to KILL the server?'
+                        print 'Note: Unless you CMD>>saveworld, you may lose progress in your world!'
                         quit_input = raw_input('KillServer [y/N]')
                         cmdHistory.append('[H]>KillServer [y/N]>' + quit_input)
 
@@ -219,14 +270,23 @@ if __name__ == '__main__':
 
                     elif len(cmd_input.split(' ')) == 1 and cmdList[x][0] == 'getchat':
                         rcon_return = con.rcon(cmdList[x][0])
-
+                        if conf['logs']:
+                            try:
+                                os.makedirs("logs")
+                            except OSError as exception:
+                                if exception.errno != errno.EEXIST:
+                                    print 'Unable to create logs folder.'
+                            clHist = open("logs\Chat.log", "a")
                         for chatline in rcon_return.splitlines():
                             if len(chatline) > 1 and not chatline.__contains__('Server received, But no response!!'):
                                 chatHistory.append(chatline)
                                 print chatline
-
+                                if conf['logs']:
+                                    clHist.write(chatline + '\n')
+                        if conf['logs']:
+                            clHist.close()
                         if range(len(rcon_return.splitlines())) == 0:
-                            print 'There are currently no messages to retrieve on the server.'
+                            print 'There are currently no messages to retrieve from the server.'
                             break
 
                         rcon_return = None
@@ -268,7 +328,7 @@ if __name__ == '__main__':
                         print rcon_return
 
                         player_input = raw_input('PlayerID>>')
-                        cmdHistory.append('[H]>PayerID>' + player_input)
+                        cmdHistory.append('[H]>PlayerID>' + player_input)
                         if player_input.split(' ')[0] is not None:
                             playerSteam = connectedPlayers[int(player_input.split(' ', 1)[0])][2]
                             rcon_return = con.rcon(cmdList[x][0] + ' ' + playerSteam)
@@ -291,7 +351,7 @@ if __name__ == '__main__':
                                 rcon_return = con.rcon(cmdList[x][0] + ' ' + playerData[2])
                                 player_found = True
                         if not player_found:
-                            print 'That player is currently not in the server.'
+                            print 'That player is not currently in the server.'
                             break
 
                     elif len(cmd_input.split(' ')) > 1:
@@ -310,7 +370,7 @@ if __name__ == '__main__':
                 rcon_return = None
             cmd_ran = False
         else:
-            print '-bash: That command is not support. Type help after CMD>> for a list of commands.'
+            print '-bash: That command is not supported. Type help after CMD>> for a list of commands.'
 
         if len(sys.argv) > 1:
             break
