@@ -44,7 +44,6 @@ cmdList.append(['serverchattoplayer', '<PlayerName> <message>', 'msg user by pla
 # program commands
 cmdList.append(['man', '<cmd>', 'man <cmd>    info about command'])
 cmdList.append(['help', '', 'prints back this list of commands'])
-# TODO: store history in a file
 cmdList.append(['history', '[(cmd)|chat]', 'show chat/cmd history, use getchat to save chat history'])
 cmdList.append(['clear', '[(cmd)|chat]', 'clear chat/cmd history, no argument will clear cmd history'])
 
