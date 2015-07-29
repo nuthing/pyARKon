@@ -31,7 +31,7 @@ cmdList.append(['slomo', '<0.0 - 5.0>', 'Speed up or slow down server time float
 cmdList.append(['pause', '', 'Pauses the server.'])
 cmdList.append(['destroyallenemies', '', 'WARNING(death): destroy all enemy/dino'])
 cmdList.append(['saveworld', '', 'CAUTION(lag): force world save'])
-cmdList.append(['quit', '', 'WARNING(corruption): kill server!! in rcon cmd>>pause cmd>>saveworld cmd>>quit'])
+cmdList.append(['doexit', '', 'WARNING(corruption): kill server!! in rcon cmd>>pause cmd>>saveworld cmd>>doexit'])
 cmdList.append(['settimeofday', '<00:00 - 23:59>', 'set time of day, 24hr separated by hrs:min'])
 # chat commands
 cmdList.append(['setmessageoftheday', '<message>', 'sets the MOTD'])
@@ -92,8 +92,8 @@ if __name__ == '__main__':
             cfg_input = {}
             cfg_input['host'] = raw_input('ARK RCON IP>>')
             cfg_input['port'] = raw_input('ARK RCON PORT>>')
-            cfg_input['pass'] = getpass.getpass('ARK RCON Password>>')
-            #cfg_input['pass'] = raw_input('Raw Password>>')
+            #cfg_input['pass'] = getpass.getpass('ARK RCON Password>>')
+            cfg_input['pass'] = raw_input('Raw Password>>')
             cfg_input['timeout'] = 15
             cfg_input['sleep'] = 3
             cfg_input['debug'] = False
@@ -252,17 +252,6 @@ if __name__ == '__main__':
 
                         else:
                             print '-bash: Unknown cmd argument. Type man clear for help.'
-
-                    elif cmdList[x][0] == 'quit':
-                        print 'Are you sure you want to KILL the server?'
-                        print 'Note: Unless you CMD>>saveworld, you may lose progress in your world!'
-                        quit_input = raw_input('KillServer [y/N]')
-                        cmdHistory.append('[H]>KillServer [y/N]>' + quit_input)
-
-                        if quit_input.split(' ', 1)[0] == ('y' or 'Y'):
-                            rcon_return = con.rcon(cmdList[x][0])
-                        else:
-                            break
 
                     elif len(cmd_input.split(' ', 1)) == 1 and cmdList[x][0] == 'broadcast':
                         print '-bash: Missing cmd argument. Type man broadcast for help.'
