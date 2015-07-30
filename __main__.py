@@ -62,9 +62,7 @@ if __name__ == '__main__':
         if config.has_option('pyARKon', 'logs'):
             conf['logs'] = config.getboolean('pyARKon', 'logs')
         else:
-            cfg_input_logs = raw_input('Log chat to file: True/False>>')
-            conf['logs'] = cfg_input_logs
-            config.set('pyARKon', 'logs', cfg_input_logs)
+            config.set('pyARKon', 'logs', 'False')
 
             if os.path.isfile('settings.cfg'):
                 with open('settings.cfg', 'w') as configfile:
@@ -92,8 +90,8 @@ if __name__ == '__main__':
             cfg_input = {}
             cfg_input['host'] = raw_input('ARK RCON IP>>')
             cfg_input['port'] = raw_input('ARK RCON PORT>>')
-            #cfg_input['pass'] = getpass.getpass('ARK RCON Password>>')
-            cfg_input['pass'] = raw_input('Raw Password>>')
+            cfg_input['pass'] = getpass.getpass('ARK RCON Password>>')
+            # cfg_input['pass'] = raw_input('Raw Password>>')
             cfg_input['timeout'] = 15
             cfg_input['sleep'] = 3
             cfg_input['debug'] = False
@@ -115,7 +113,7 @@ if __name__ == '__main__':
                 config.set('pyARKon', 'timeout', cfg_input['timeout'])
                 config.set('pyARKon', 'sleep', cfg_input['sleep'])
                 config.set('pyARKon', 'debug', cfg_input['debug'])
-                config.set('pyARKon', 'tlogs', cfg_input['logs'])
+                config.set('pyARKon', 'ogs', cfg_input['logs'])
                 conf['host'] = cfg_input['host']
                 conf['port'] = int(cfg_input['port'])
                 conf['pass'] = cfg_input['timeout']
