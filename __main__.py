@@ -62,7 +62,7 @@ if __name__ == '__main__':
         if config.has_option('pyARKon', 'logs'):
             conf['logs'] = config.getboolean('pyARKon', 'logs')
         else:
-            config.set('pyARKon', 'logs', 'False')
+            config.set('pyARKon', 'logs', False)
 
             if os.path.isfile('settings.cfg'):
                 with open('settings.cfg', 'w') as configfile:
