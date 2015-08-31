@@ -113,7 +113,7 @@ if __name__ == '__main__':
                 config.set('pyARKon', 'timeout', cfg_input['timeout'])
                 config.set('pyARKon', 'sleep', cfg_input['sleep'])
                 config.set('pyARKon', 'debug', cfg_input['debug'])
-                config.set('pyARKon', 'ogs', cfg_input['logs'])
+                config.set('pyARKon', 'logs', cfg_input['logs'])
                 conf['host'] = cfg_input['host']
                 conf['port'] = int(cfg_input['port'])
                 conf['pass'] = cfg_input['timeout']
