@@ -1,3 +1,5 @@
+![Travis-CI Build Results](https://travis-ci.org/nuthing/pyARKon.svg)
+
 visit the [wiki](https://github.com/nuthing/pyARKon/wiki)
 
 https://github.com/nuthing/pyARKon/wiki
