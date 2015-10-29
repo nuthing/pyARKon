@@ -1,4 +1,4 @@
-![Travis-CI Build Results](https://travis-ci.org/nuthing/pyARKon.svg)
+[![Build Status](https://travis-ci.org/nuthing/pyARKon.svg?branch=master)](https://travis-ci.org/nuthing/pyARKon)
 
 visit the [wiki](https://github.com/nuthing/pyARKon/wiki)
 
