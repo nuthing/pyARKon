@@ -113,7 +113,7 @@ if __name__ == '__main__':
                 config.set('pyARKon', 'timeout', cfg_input['timeout'])
                 config.set('pyARKon', 'sleep', cfg_input['sleep'])
                 config.set('pyARKon', 'debug', cfg_input['debug'])
-                config.set('pyARKon', 'ogs', cfg_input['logs'])
+                config.set('pyARKon', 'logs', cfg_input['logs'])
                 conf['host'] = cfg_input['host']
                 conf['port'] = int(cfg_input['port'])
                 conf['pass'] = cfg_input['timeout']
@@ -154,7 +154,7 @@ if __name__ == '__main__':
             except OSError as exception:
                 if exception.errno != errno.EEXIST:
                     print 'Unable to create logs folder.'
-            cmdHist = open("logs\CMD.log", "a")
+            cmdHist = open(os.path.join("logs", "CMD.log"), "a")
             cmdHist.write(time.strftime("[%m/%d/%Y %H:%M:%S %p] ") + cmd_input + '\n')
             cmdHist.close()
 
@@ -203,7 +203,7 @@ if __name__ == '__main__':
                     if len(cmd_input.split(' ', 1)) > 1 and cmdList[x][0] == 'history':
                         if cmd_input.split(' ', 1)[1] == 'cmd':
                             if conf['logs']:
-                                for cmdHist in open("logs\CMD.log").read().splitlines():
+                                for cmdHist in open(os.path.join("logs", "CMD.log")).read().splitlines():
                                     print cmdHist
                             else:
                                 for y in range(len(cmdHistory)):
@@ -217,7 +217,7 @@ if __name__ == '__main__':
                                 except OSError as exception:
                                     if exception.errno != errno.EEXIST:
                                         print 'Unable to create logs folder.'
-                                clHist = open("logs\Chat.log", "a")
+                                clHist = open(os.path.join("logs", "Chat.log"), "a")
                             for chatline in rcon_return.splitlines():
                                 if len(chatline) > 1 and not chatline.__contains__('Server received, But no response!!'):
                                     chatHistory.append(chatline)
@@ -228,7 +228,7 @@ if __name__ == '__main__':
 
                             rcon_return = None
                             if conf['logs']:
-                                for chatHist in open("logs\Chat.log").read().splitlines():
+                                for chatHist in open(os.path.join("logs", "Chat.log")).read().splitlines():
                                     print chatHist
                             else:
                                 for y in range(len(chatHistory)):
@@ -262,7 +262,7 @@ if __name__ == '__main__':
                             except OSError as exception:
                                 if exception.errno != errno.EEXIST:
                                     print 'Unable to create logs folder.'
-                            clHist = open("logs\Chat.log", "a")
+                            clHist = open(os.path.join("logs", "Chat.log"), "a")
                         for chatline in rcon_return.splitlines():
                             if len(chatline) > 1 and not chatline.__contains__('Server received, But no response!!'):
                                 chatHistory.append(chatline)
